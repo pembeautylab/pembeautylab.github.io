@@ -466,7 +466,8 @@ textarea:focus, input:focus, select:focus {
     <div class="chips">
       <div class="chip active" onclick="setChip(this,'ic-dil','tr')">🇹🇷 Türkçe</div>
       <div class="chip" onclick="setChip(this,'ic-dil','de')">🇩🇪 Almanca</div>
-      <div class="chip" onclick="setChip(this,'ic-dil','both')">İkisi de</div>
+      <div class="chip" onclick="setChip(this,'ic-dil','en')">🇬🇧 İngilizce</div>
+      <div class="chip" onclick="setChip(this,'ic-dil','both')">Üçü de</div>
     </div>
   </div>
   <button class="btn" onclick="icerikUret()">✨ İçerik Üret</button>
@@ -777,7 +778,7 @@ async function icerikUret() {
 
   const tonMap = {merak:'merak uyandıran', guven:'güven inşa eden', sonuc:'sonuç odaklı', duygusal:'duygusal/ilham verici', cta:'harekete geçirici (CTA)'};
   const fmtMap = {reel:'Instagram Reels caption', story:'Instagram Story kısa metin (max 3 cümle)', carousel:'Instagram Carousel (başlık + 5 slayt metni)'};
-  const dilMap = {tr:'Türkçe', de:'Almanca', both:'hem Türkçe hem Almanca (ikisi ayrı ayrı)'};
+  const dilMap = {tr:'Türkçe', de:'Almanca', en:'İngilizce', both:'Türkçe, Almanca ve İngilizce (üçü ayrı ayrı)'};
 
   document.getElementById('icerik-loading').classList.add('show');
   document.getElementById('icerik-result').classList.remove('show');

@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Pem Beauty Lab — Asistan</title>
+<link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --pink: #D4256A;
+  --pink-light: #f7c5da;
+  --pink-deep: #a8174f;
+  --pink-bg: #fdf0f5;
+  --text-dark: #C0185A;
+  --radius: 16px;
+  --white: #fff;
+}
+body {
+  font-family: 'Comfortaa', sans-serif;
+  background: var(--pink-bg);
+  min-height: 100vh;
+  color: #333;
+  overflow-x: hidden;
+}
+
+/* HEADER */
+.header {
+  background: linear-gradient(135deg, #fce4ee 0%, var(--pink) 100%);
+  padding: 16px 18px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  box-shadow: 0 4px 20px rgba(212,37,106,0.2);
+  position: sticky;
+  top: 0;
+  z-index: 200;
+}
+.logo-img {
+  width: 52px; height: 52px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2.5px solid #fff;
+  box-shadow: 0 0 0 3px rgba(212,37,106,0.3), 0 0 18px rgba(212,37,106,0.5);
+  animation: logoGlow 2.5s ease-in-out infinite;
+  flex-shrink: 0;
+}
+@keyframes logoGlow {
+  0%,100% { box-shadow: 0 0 0 3px rgba(212,37,106,0.3), 0 0 18px rgba(212,37,106,0.4); }
+  50% { box-shadow: 0 0 0 7px rgba(212,37,106,0.15), 0 0 35px rgba(212,37,106,0.7); }
+}
+.header-text h1 { font-size: 16px; font-weight: 300; letter-spacing: 3px; color: #fff; text-transform: uppercase; }
+.header-text p { font-size: 10px; color: rgba(255,255,255,0.8); letter-spacing: 1px; margin-top: 2px; }
+.dark-toggle {
+  margin-left: auto;
+  background: rgba(255,255,255,0.2);
+  border: none; border-radius: 20px;
+  padding: 7px 12px; color: #fff;
+  font-family: 'Comfortaa', sans-serif;
+  font-size: 12px; cursor: pointer;
+  transition: background 0.2s;
+}
+.dark-toggle:hover { background: rgba(255,255,255,0.35); }
+
+/* DARK MODE */
+body.dark {
+  background: #1a0a10;
+  color: #f0d0e0;
+}
+body.dark .card { background: #2a1020; border-color: #5a2040; }
+body.dark textarea, body.dark input, body.dark select {
+  background: #1a0a10; color: #f0d0e0; border-color: #5a2040;
+}
+body.dark .result-box { background: #2a1020; border-color: #5a2040; color: #f0d0e0; }
+body.dark .tabs { background: #2a1020; border-color: #5a2040; }
+body.dark .tab { color: #b07090; }
+body.dark .tab.active { color: var(--pink-light); border-bottom-color: var(--pink-light); }
+body.dark .loc-btn { background: #2a1020; border-color: #5a2040; color: #b07090; }
+body.dark .chip { background: #2a1020; border-color: #5a2040; color: var(--pink-light); }
+body.dark .copy-btn { background: #2a1020; border-color: #5a2040; color: var(--pink-light); }
+body.dark .history-item { background: #2a1020; border-color: #5a2040; }
+body.dark .section-title { color: var(--pink-light); }
+
+/* TABS */
+.tabs {
+  display: flex;
+  background: #fff;
+  border-bottom: 2px solid var(--pink-light);
+  overflow-x: auto;
+  scrollbar-width: none;
+  position: sticky;
+  top: 84px;
+  z-index: 100;
+}
+.tabs::-webkit-scrollbar { display: none; }
+.tab {
+  flex: 1; min-width: 70px;
+  padding: 12px 6px;
+  text-align: center;
+  font-family: 'Comfortaa', sans-serif;
+  font-size: 11px; font-weight: 400;
+  color: #b07090;
+  border: none; background: none; cursor: pointer;
+  transition: all 0.2s;
+  border-bottom: 3px solid transparent;
+}
+.tab .ti { font-size: 18px; display: block; margin-bottom: 2px; }
+.tab.active { color: var(--pink); border-bottom-color: var(--pink); font-weight: 600; }
+.tab:hover { color: var(--pink); }
+
+/* PANELS */
+.panel { display: none; padding: 16px 14px 120px; max-width: 600px; margin: 0 auto; }
+.panel.active { display: block; }
+
+/* SECTION TITLE */
+.section-title {
+  font-size: 11px; letter-spacing: 2.5px; text-transform: uppercase;
+  color: var(--text-dark); font-weight: 600;
+  margin: 18px 0 8px 2px;
+}
+
+/* CARD */
+.card {
+  background: #fff;
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 10px;
+  box-shadow: 0 2px 12px rgba(212,37,106,0.07);
+  border: 1px solid rgba(212,37,106,0.1);
+}
+.card-label {
+  font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--pink); font-weight: 600; margin-bottom: 10px;
+}
+
+textarea, input[type=text], input[type=datetime-local], select {
+  width: 100%; padding: 12px 14px;
+  border: 1.5px solid var(--pink-light);
+  border-radius: 12px;
+  font-family: 'Comfortaa', sans-serif;
+  font-size: 14px; color: #333;
+  background: #fff;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  resize: none;
+}
+textarea:focus, input:focus, select:focus {
+  border-color: var(--pink);
+  box-shadow: 0 0 0 3px rgba(212,37,106,0.08);
+}
+
+/* BUTTONS */
+.btn {
+  width: 100%; padding: 14px;
+  background: linear-gradient(135deg, var(--pink), var(--pink-deep));
+  color: #fff; border: none; border-radius: 13px;
+  font-family: 'Comfortaa', sans-serif;
+  font-size: 14px; font-weight: 600;
+  cursor: pointer; margin-top: 10px;
+  letter-spacing: 0.5px;
+  transition: all 0.2s;
+  box-shadow: 0 4px 15px rgba(212,37,106,0.3);
+}
+.btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(212,37,106,0.4); }
+.btn:active { transform: translateY(0); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+/* LOC TOGGLE */
+.loc-toggle { display: flex; gap: 8px; }
+.loc-btn {
+  flex: 1; padding: 10px 8px; border-radius: 10px;
+  border: 1.5px solid var(--pink-light);
+  background: #fff; color: #b07090;
+  font-family: 'Comfortaa', sans-serif; font-size: 12px;
+  cursor: pointer; transition: all 0.2s; text-align: center;
+}
+.loc-btn.active {
+  background: linear-gradient(135deg, var(--pink), var(--pink-deep));
+  color: #fff; border-color: var(--pink);
+}
+
+/* CHIPS */
+.chips { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 8px; }
+.chip {
+  padding: 7px 12px; border-radius: 20px;
+  border: 1.5px solid var(--pink-light);
+  background: #fff; color: var(--pink);
+  font-family: 'Comfortaa', sans-serif; font-size: 11px;
+  cursor: pointer; transition: all 0.2s;
+}
+.chip.active, .chip:hover {
+  background: var(--pink); color: #fff; border-color: var(--pink);
+}
+
+/* RESULT */
+.result-box {
+  background: #fdf0f5;
+  border: 1.5px solid var(--pink-light);
+  border-radius: 12px;
+  padding: 14px;
+  margin-top: 10px;
+  font-size: 14px; line-height: 1.75;
+  color: #333;
+  white-space: pre-wrap;
+  display: none;
+}
+.result-box.show { display: block; }
+.result-label {
+  font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--pink); font-weight: 600; margin-bottom: 8px;
+}
+
+/* LOADING */
+.loading { text-align: center; padding: 24px; display: none; }
+.loading.show { display: block; }
+.spinner {
+  width: 36px; height: 36px;
+  border: 3px solid var(--pink-light);
+  border-top-color: var(--pink);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 10px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading p { color: var(--pink); font-size: 12px; letter-spacing: 1px; }
+
+/* COPY BTN */
+.copy-btn {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 7px 14px; border-radius: 8px;
+  border: 1.5px solid var(--pink-light);
+  background: #fff; color: var(--pink);
+  font-family: 'Comfortaa', sans-serif; font-size: 11px;
+  cursor: pointer; margin-top: 8px;
+  transition: all 0.2s;
+}
+.copy-btn:hover { background: #fce4ee; }
+
+/* TEMPLATES */
+.template-btn {
+  display: block; width: 100%;
+  padding: 12px 14px; margin-bottom: 8px;
+  background: #fff; border: 1.5px solid var(--pink-light);
+  border-radius: 12px; text-align: left;
+  font-family: 'Comfortaa', sans-serif; font-size: 13px;
+  color: var(--text-dark); cursor: pointer;
+  transition: all 0.2s;
+}
+.template-btn:hover { background: #fce4ee; border-color: var(--pink); }
+.template-btn .t-icon { margin-right: 8px; }
+
+/* HISTORY */
+.history-item {
+  background: #fff;
+  border: 1px solid rgba(212,37,106,0.12);
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.history-item:hover { border-color: var(--pink); background: #fef5f9; }
+.history-meta { font-size: 10px; color: #b07090; letter-spacing: 1px; margin-bottom: 5px; }
+.history-preview { font-size: 13px; color: #444; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.history-empty { text-align: center; color: #c0a0b0; font-size: 13px; padding: 30px; }
+
+/* UYARI BADGES */
+.uyari-list { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+.uyari-badge {
+  background: #fff5f8; border: 1.5px solid #ffd0e0;
+  border-radius: 10px; padding: 10px 13px;
+  font-size: 13px; color: #c0185a;
+  display: flex; align-items: center; gap: 8px;
+}
+
+/* BG IMAGE PREVIEW in header */
+.header-bg {
+  position: absolute; inset: 0;
+  background-size: cover; background-position: center;
+  opacity: 0.12;
+  pointer-events: none;
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-bg" id="headerBg"></div>
+  <img class="logo-img" id="logoImg" src="" alt="Pem Beauty Lab">
+  <div class="header-text">
+    <h1>Pem Beauty Lab</h1>
+    <p>AI Asistan Paneli</p>
+  </div>
+  <button class="dark-toggle" onclick="toggleDark()">🌙 Dark</button>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('mesaj',0)"><span class="ti">📩</span>Mesaj</button>
+  <button class="tab" onclick="switchTab('randevu',1)"><span class="ti">📅</span>Randevu</button>
+  <button class="tab" onclick="switchTab('fiyat',2)"><span class="ti">💰</span>Fiyat</button>
+  <button class="tab" onclick="switchTab('icerik',3)"><span class="ti">📱</span>İçerik</button>
+  <button class="tab" onclick="switchTab('sablon',4)"><span class="ti">📋</span>Şablon</button>
+  <button class="tab" onclick="switchTab('gecmis',5)"><span class="ti">💾</span>Geçmiş</button>
+</div>
+
+<!-- ===== MESAJ ===== -->
+<div class="panel active" id="panel-mesaj">
+  <div class="section-title">Müşteri Mesajı Analizi</div>
+
+  <div class="card">
+    <div class="card-label">📩 Gelen Mesaj</div>
+    <textarea id="musteri-mesaj" rows="4" placeholder="Müşteri mesajını buraya yapıştır..."></textarea>
+  </div>
+  <div class="card">
+    <div class="card-label">📝 Müşteri Notu (opsiyonel)</div>
+    <input type="text" id="musteri-notu" placeholder="Örn: Daha önce lip filler yaptırdı, hassas cilt...">
+  </div>
+  <div class="card">
+    <div class="card-label">📍 Lokasyon</div>
+    <div class="loc-toggle">
+      <div class="loc-btn active" id="loc-tr" onclick="setLoc('tr','loc')">🇹🇷 Türkiye</div>
+      <div class="loc-btn" id="loc-de" onclick="setLoc('de','loc')">🇩🇪 Almanya</div>
+    </div>
+  </div>
+  <button class="btn" onclick="mesajAnaliz()">✨ Analiz Et & Cevap Yaz</button>
+
+  <div class="loading" id="mesaj-loading"><div class="spinner"></div><p>Claude düşünüyor...</p></div>
+
+  <div class="result-box" id="ceviri-box"><div class="result-label">🇹🇷 Türkçe Çeviri</div><div id="ceviri-text"></div></div>
+  <div class="result-box" id="cevap-box">
+    <div class="result-label">💬 Cevap Taslağı (Türkçe — senin için)</div>
+    <div id="cevap-text"></div>
+    <button class="copy-btn" onclick="kopyala('cevap-text')">📋 Kopyala</button>
+  </div>
+  <div class="result-box" id="cevap-musteri-box">
+    <div class="result-label">🌍 Müşteri Diline Çeviri</div>
+    <div id="cevap-musteri-text"></div>
+    <button class="copy-btn" onclick="kopyala('cevap-musteri-text')">📋 Kopyala</button>
+  </div>
+</div>
+
+<!-- ===== RANDEVU ===== -->
+<div class="panel" id="panel-randevu">
+  <div class="section-title">Randevu Onay Mesajı</div>
+
+  <div class="card">
+    <div class="card-label">👤 Müşteri Adı</div>
+    <input type="text" id="r-ad" placeholder="Ad Soyad">
+  </div>
+  <div class="card">
+    <div class="card-label">📅 Tarih & Saat</div>
+    <input type="datetime-local" id="r-tarih">
+  </div>
+  <div class="card">
+    <div class="card-label">💆 Tedavi</div>
+    <select id="r-tedavi">
+      <option value="">Seç...</option>
+      <option>Lip Filler</option><option>Facial Filler</option>
+      <option>Botoks</option><option>PRP</option>
+      <option>Mezoterapi</option><option>RF Needling</option>
+      <option>HIFU</option><option>Microneedling</option>
+      <option>Aqua Facial</option><option>Thread Lifting</option>
+    </select>
+  </div>
+  <div class="card">
+    <div class="card-label">📍 Lokasyon</div>
+    <div class="loc-toggle">
+      <div class="loc-btn active" id="rloc-tr" onclick="setLoc('tr','rloc')">🇹🇷 Türkiye</div>
+      <div class="loc-btn" id="rloc-de" onclick="setLoc('de','rloc')">🇩🇪 Almanya</div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-label">⚠️ Tedavi Öncesi Uyarılar Eklensin mi?</div>
+    <div class="chips">
+      <div class="chip active" id="uyari-evet" onclick="setUyari(true)">✅ Evet</div>
+      <div class="chip" id="uyari-hayir" onclick="setUyari(false)">❌ Hayır</div>
+    </div>
+  </div>
+  <button class="btn" onclick="randevuOnayi()">✉️ Onay Mesajı Oluştur</button>
+
+  <div class="loading" id="randevu-loading"><div class="spinner"></div><p>Hazırlanıyor...</p></div>
+  <div class="result-box" id="randevu-result">
+    <div class="result-label">✅ Onay Mesajı</div>
+    <div id="randevu-text"></div>
+    <button class="copy-btn" onclick="kopyala('randevu-text')">📋 Kopyala</button>
+  </div>
+</div>
+
+<!-- ===== FİYAT ===== -->
+<div class="panel" id="panel-fiyat">
+  <div class="section-title">Fiyat Bilgilendirme</div>
+
+  <div class="card">
+    <div class="card-label">💆 Tedavi</div>
+    <select id="f-tedavi">
+      <option value="">Seç...</option>
+      <option>Lip Filler (0.5ml)</option><option>Lip Filler (1ml)</option>
+      <option>Facial Filler</option><option>Botoks (1 bölge)</option>
+      <option>Botoks (2 bölge)</option><option>Botoks (3 bölge)</option>
+      <option>PRP</option><option>Mezoterapi</option>
+      <option>RF Needling</option><option>HIFU</option>
+      <option>Microneedling</option><option>Aqua Facial</option>
+      <option>Thread Lifting</option>
+    </select>
+  </div>
+  <div class="card">
+    <div class="card-label">📍 Lokasyon</div>
+    <div class="loc-toggle">
+      <div class="loc-btn active" id="floc-tr" onclick="setLoc('tr','floc')">🇹🇷 Türkiye</div>
+      <div class="loc-btn" id="floc-de" onclick="setLoc('de','floc')">🇩🇪 Almanya</div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-label">🌍 Müşteri Dili</div>
+    <div class="chips">
+      <div class="chip active" onclick="setDil(this,'tr')">🇹🇷 Türkçe</div>
+      <div class="chip" onclick="setDil(this,'de')">🇩🇪 Almanca</div>
+      <div class="chip" onclick="setDil(this,'en')">🇬🇧 İngilizce</div>
+    </div>
+  </div>
+  <button class="btn" onclick="fiyatMesaj()">💬 Fiyat Mesajı Oluştur</button>
+
+  <div class="loading" id="fiyat-loading"><div class="spinner"></div><p>Hazırlanıyor...</p></div>
+  <div class="result-box" id="fiyat-result">
+    <div class="result-label">💰 Fiyat Mesajı</div>
+    <div id="fiyat-text"></div>
+    <button class="copy-btn" onclick="kopyala('fiyat-text')">📋 Kopyala</button>
+  </div>
+</div>
+
+<!-- ===== İÇERİK ===== -->
+<div class="panel" id="panel-icerik">
+  <div class="section-title">Instagram İçerik Üretimi</div>
+
+  <div class="card">
+    <div class="card-label">💆 Konu</div>
+    <select id="ic-konu">
+      <option value="">Seç...</option>
+      <option>Botoks</option><option>Lip Filler</option>
+      <option>PRP</option><option>Mezoterapi</option>
+      <option>HIFU</option><option>Microneedling</option>
+      <option>Aqua Facial</option><option>Thread Lifting</option>
+      <option>Genel Güzellik</option>
+    </select>
+  </div>
+  <div class="card">
+    <div class="card-label">🎯 Ton</div>
+    <div class="chips">
+      <div class="chip active" onclick="setChip(this,'ton','merak')">🤔 Merak</div>
+      <div class="chip" onclick="setChip(this,'ton','guven')">🤝 Güven</div>
+      <div class="chip" onclick="setChip(this,'ton','sonuc')">✨ Sonuç</div>
+      <div class="chip" onclick="setChip(this,'ton','duygusal')">💗 Duygusal</div>
+      <div class="chip" onclick="setChip(this,'ton','cta')">📣 CTA</div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-label">📱 Format</div>
+    <div class="chips">
+      <div class="chip active" onclick="setChip(this,'format','reel')">🎬 Reel</div>
+      <div class="chip" onclick="setChip(this,'format','story')">📖 Story</div>
+      <div class="chip" onclick="setChip(this,'format','carousel')">🎠 Carousel</div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-label">🌍 Dil</div>
+    <div class="chips">
+      <div class="chip active" onclick="setChip(this,'ic-dil','tr')">🇹🇷 Türkçe</div>
+      <div class="chip" onclick="setChip(this,'ic-dil','de')">🇩🇪 Almanca</div>
+      <div class="chip" onclick="setChip(this,'ic-dil','both')">İkisi de</div>
+    </div>
+  </div>
+  <button class="btn" onclick="icerikUret()">✨ İçerik Üret</button>
+
+  <div class="loading" id="icerik-loading"><div class="spinner"></div><p>Üretiliyor...</p></div>
+  <div class="result-box" id="icerik-result">
+    <div class="result-label">📱 Instagram İçeriği</div>
+    <div id="icerik-text"></div>
+    <button class="copy-btn" onclick="kopyala('icerik-text')">📋 Kopyala</button>
+  </div>
+</div>
+
+<!-- ===== ŞABLON ===== -->
+<div class="panel" id="panel-sablon">
+  <div class="section-title">Hazır Mesaj Şablonları</div>
+  <p style="font-size:12px;color:#b07090;margin-bottom:14px;">Tıkla → Mesaj sekmesine otomatik yapıştırılır</p>
+
+  <button class="template-btn" onclick="useTemplate('Merhaba, fiyatlarınızı öğrenebilir miyim?')">
+    <span class="t-icon">💬</span>Fiyat soruyorum
+  </button>
+  <button class="template-btn" onclick="useTemplate('Randevu almak istiyorum, müsait günleriniz var mı?')">
+    <span class="t-icon">📅</span>Randevu almak istiyorum
+  </button>
+  <button class="template-btn" onclick="useTemplate('Daha önce yaptırdım, tekrar gelmek istiyorum.')">
+    <span class="t-icon">🔄</span>Tekrar randevu
+  </button>
+  <button class="template-btn" onclick="useTemplate('Randevumu iptal etmek istiyorum.')">
+    <span class="t-icon">❌</span>İptal talebi
+  </button>
+  <button class="template-btn" onclick="useTemplate('İşlemden sonra şişlik ne zaman geçer?')">
+    <span class="t-icon">❓</span>İşlem sonrası soru
+  </button>
+  <button class="template-btn" onclick="useTemplate('Botoks yaptırmak istiyorum ama korkuyorum, acıyor mu?')">
+    <span class="t-icon">😟</span>Endişeli müşteri
+  </button>
+  <button class="template-btn" onclick="useTemplate('Ich möchte einen Termin vereinbaren. Wann haben Sie Zeit?')">
+    <span class="t-icon">🇩🇪</span>Almanca randevu talebi
+  </button>
+  <button class="template-btn" onclick="useTemplate('I would like to book an appointment. Do you have availability?')">
+    <span class="t-icon">🇬🇧</span>İngilizce randevu talebi
+  </button>
+
+  <div class="section-title" style="margin-top:24px;">⚠️ Tedavi Öncesi Uyarılar</div>
+  <div class="uyari-list">
+    <div class="uyari-badge">💊 Kan sulandırıcı ilaç kullanmayın (aspirin, ibuprofen)</div>
+    <div class="uyari-badge">🚫 Alkol almayın (3 gün önce)</div>
+    <div class="uyari-badge">💄 Makyajsız gelin</div>
+    <div class="uyari-badge">🌞 Güneş yanığı olmasın</div>
+    <div class="uyari-badge">🤒 Hasta değilseniz (soğuk algınlığı vs.)</div>
+    <div class="uyari-badge">💉 Herpes varsa önceden söyleyin</div>
+    <div class="uyari-badge">🍽️ Açken gelmeyin</div>
+  </div>
+</div>
+
+<!-- ===== GEÇMİŞ ===== -->
+<div class="panel" id="panel-gecmis">
+  <div class="section-title">Kaydedilen Cevaplar</div>
+  <div id="gecmis-liste"></div>
+  <button class="btn" style="background: linear-gradient(135deg, #e07090, #c04060); margin-top:8px;" onclick="gecmisTemizle()">🗑️ Tümünü Temizle</button>
+</div>
+
+<script>
+// ===== STATE =====
+const state = {
+  loc: 'tr', rloc: 'tr', floc: 'tr',
+  uyari: true,
+  fiyat_dil: 'tr',
+  ton: 'merak', format: 'reel', icdil: 'tr'
+};
+
+// ===== IMAGES (injected below) =====
+const BG_URL = 'https://pembeautylab.github.io/scene.png';
+const LOGO_URL = 'https://pembeautylab.github.io/exportedLayer%202.png';
+
+window.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('logoImg').src = LOGO_URL;
+  document.getElementById('headerBg').style.backgroundImage = 'url(' + BG_URL + ')';
+  renderGecmis();
+});
+
+// ===== DARK MODE =====
+function toggleDark() {
+  document.body.classList.toggle('dark');
+  const btn = document.querySelector('.dark-toggle');
+  btn.textContent = document.body.classList.contains('dark') ? '☀️ Light' : '🌙 Dark';
+}
+
+// ===== TABS =====
+function switchTab(name, idx) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+  document.querySelectorAll('.tab')[idx].classList.add('active');
+}
+
+// ===== LOC =====
+function setLoc(val, prefix) {
+  state[prefix] = val;
+  document.getElementById(prefix + '-tr').classList.toggle('active', val === 'tr');
+  document.getElementById(prefix + '-de').classList.toggle('active', val === 'de');
+}
+function setUyari(val) {
+  state.uyari = val;
+  document.getElementById('uyari-evet').classList.toggle('active', val);
+  document.getElementById('uyari-hayir').classList.toggle('active', !val);
+}
+function setDil(el, val) {
+  state.fiyat_dil = val;
+  el.closest('.chips').querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+}
+function setChip(el, type, val) {
+  state[type === 'ic-dil' ? 'icdil' : type] = val;
+  el.closest('.chips').querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// ===== TEMPLATES =====
+function useTemplate(text) {
+  document.getElementById('musteri-mesaj').value = text;
+  switchTab('mesaj', 0);
+}
+
+// ===== COPY =====
+function kopyala(id) {
+  const text = document.getElementById(id).innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    const el = document.querySelector(`[onclick="kopyala('${id}')"]`);
+    el.textContent = '✓ Kopyalandı!';
+    setTimeout(() => { el.textContent = '📋 Kopyala'; }, 2000);
+  });
+}
+
+// ===== HISTORY =====
+function saveToHistory(type, preview, content) {
+  const history = JSON.parse(localStorage.getItem('pemHistory') || '[]');
+  history.unshift({ type, preview, content, time: new Date().toLocaleString('tr-TR') });
+  if (history.length > 20) history.pop();
+  localStorage.setItem('pemHistory', JSON.stringify(history));
+  renderGecmis();
+}
+function renderGecmis() {
+  const history = JSON.parse(localStorage.getItem('pemHistory') || '[]');
+  const el = document.getElementById('gecmis-liste');
+  if (!history.length) {
+    el.innerHTML = '<div class="history-empty">Henüz kayıt yok 🌸</div>';
+    return;
+  }
+  el.innerHTML = history.map((h, i) => `
+    <div class="history-item" onclick="showHistory(${i})">
+      <div class="history-meta">${h.time} · ${h.type}</div>
+      <div class="history-preview">${h.preview}</div>
+    </div>
+  `).join('');
+}
+function showHistory(i) {
+  const history = JSON.parse(localStorage.getItem('pemHistory') || '[]');
+  alert(history[i].content);
+}
+function gecmisTemizle() {
+  if (confirm('Tüm geçmiş silinsin mi?')) {
+    localStorage.removeItem('pemHistory');
+    renderGecmis();
+  }
+}
+
+// ===== CLAUDE API =====
+async function callClaude(prompt) {
+  const r = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 1000,
+      messages: [{ role: 'user', content: prompt }]
+    })
+  });
+  const d = await r.json();
+  return d.content?.[0]?.text || 'Hata oluştu.';
+}
+
+// ===== MESAJ =====
+async function mesajAnaliz() {
+  const mesaj = document.getElementById('musteri-mesaj').value.trim();
+  if (!mesaj) { alert('Mesaj gir!'); return; }
+  const not = document.getElementById('musteri-notu').value.trim();
+  const lok = state.loc === 'tr' ? 'Antalya, Türkiye' : 'Ravensburg, Almanya';
+
+  document.getElementById('mesaj-loading').classList.add('show');
+  ['ceviri-box','cevap-box','cevap-musteri-box'].forEach(id => document.getElementById(id).classList.remove('show'));
+
+  const prompt = `Sen Pem Beauty Lab asistanısın. Pem, ${lok}'da çalışan bir estetik uzman.
+${not ? `Müşteri hakkında not: ${not}` : ''}
+Depozit: 50€ (zorunlu). Fiyat pazarlığı yapılmaz. Almanya'da sadece nakit.
+
+Müşteri mesajı: "${mesaj}"
+
+3 bölüm yaz, aralarına tam olarak "---SEP---" koy:
+
+BÖLÜM1 - TÜRKÇE ÇEVİRİ:
+Mesajı Türkçe'ye çevir. Zaten Türkçe ise "✓ Mesaj zaten Türkçe" yaz.
+
+---SEP---
+
+BÖLÜM2 - TÜRKÇE CEVAP (Pem için):
+Kısa, sıcak, profesyonel. Konuya göre randevu veya fiyat yönlendir.
+
+---SEP---
+
+BÖLÜM3 - MÜŞTERİ DİLİNDE CEVAP:
+Bölüm 2'yi müşterinin mesaj dilinde yaz.`;
+
+  try {
+    const result = await callClaude(prompt);
+    const parts = result.split('---SEP---');
+    const b1 = (parts[0] || '').replace('BÖLÜM1 - TÜRKÇE ÇEVİRİ:','').trim();
+    const b2 = (parts[1] || '').replace('BÖLÜM2 - TÜRKÇE CEVAP (Pem için):','').trim();
+    const b3 = (parts[2] || '').replace('BÖLÜM3 - MÜŞTERİ DİLİNDE CEVAP:','').trim();
+
+    document.getElementById('ceviri-text').innerText = b1;
+    document.getElementById('cevap-text').innerText = b2;
+    document.getElementById('cevap-musteri-text').innerText = b3;
+    ['ceviri-box','cevap-box','cevap-musteri-box'].forEach(id => document.getElementById(id).classList.add('show'));
+    saveToHistory('📩 Mesaj', mesaj.substring(0,60) + '...', b2);
+  } catch(e) { alert('Hata: ' + e.message); }
+
+  document.getElementById('mesaj-loading').classList.remove('show');
+}
+
+// ===== RANDEVU =====
+async function randevuOnayi() {
+  const ad = document.getElementById('r-ad').value.trim();
+  const tarih = document.getElementById('r-tarih').value;
+  const tedavi = document.getElementById('r-tedavi').value;
+  if (!ad || !tarih || !tedavi) { alert('Tüm alanları doldur!'); return; }
+
+  const lok = state.rloc === 'tr' ? 'Antalya, Türkiye' : 'Ravensburg, Almanya';
+  const d = new Date(tarih);
+  const tarihStr = d.toLocaleDateString('tr-TR', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
+  const saatStr = d.toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'});
+  const depozit = state.rloc === 'tr' ? 'PayPal veya IBAN ile 50€ depozit' : 'Nakit 50€ depozit';
+  const uyariStr = state.uyari ? `
+Şu uyarıları da ekle:
+- Kan sulandırıcı ilaç almayın (aspirin, ibuprofen)
+- 3 gün öncesinden alkol almayın  
+- Makyajsız gelin
+- Açken gelmeyin` : '';
+
+  document.getElementById('randevu-loading').classList.add('show');
+  document.getElementById('randevu-result').classList.remove('show');
+
+  const prompt = `Pem Beauty Lab randevu onay mesajı yaz. Kısa ve sıcak Türkçe.
+
+Müşteri: ${ad}
+Tarih: ${tarihStr} saat ${saatStr}
+Tedavi: ${tedavi}
+Lokasyon: ${lok}
+Depozit: ${depozit} gerekiyor (ödenmeden randevu kesinleşmez)
+İptal politikası: 24 saat öncesine kadar ücretsiz iptal
+Adres: randevu onaylandıktan sonra paylaşılacak
+${uyariStr}`;
+
+  try {
+    const result = await callClaude(prompt);
+    document.getElementById('randevu-text').innerText = result;
+    document.getElementById('randevu-result').classList.add('show');
+    saveToHistory('📅 Randevu', `${ad} - ${tedavi}`, result);
+  } catch(e) { alert('Hata: ' + e.message); }
+
+  document.getElementById('randevu-loading').classList.remove('show');
+}
+
+// ===== FİYAT =====
+async function fiyatMesaj() {
+  const tedavi = document.getElementById('f-tedavi').value;
+  if (!tedavi) { alert('Tedavi seç!'); return; }
+
+  const lok = state.floc === 'tr' ? 'Türkiye (TL/€/$ günlük kur)' : 'Almanya (sadece nakit €)';
+  const dilMap = {tr:'Türkçe', de:'Almanca', en:'İngilizce'};
+
+  document.getElementById('fiyat-loading').classList.add('show');
+  document.getElementById('fiyat-result').classList.remove('show');
+
+  const prompt = `Pem Beauty Lab fiyat bilgilendirme mesajı yaz. ${dilMap[state.fiyat_dil]} olsun.
+
+Tedavi: ${tedavi}
+Lokasyon: ${lok}
+Depozit: 50€ (zorunlu, iade edilmez eğer 24 saat öncesinden iptal edilmezse)
+Ödeme: ${state.floc === 'de' ? 'Sadece nakit' : 'TL/€/$ (günlük kur ile)'}
+Önemli: Fiyat pazarlığı kesinlikle yapılmaz. Kibarca ve net belirt.
+
+Gerçekçi fiyat aralığı ver, depozit ve ödeme bilgisini ekle. Kısa tut.`;
+
+  try {
+    const result = await callClaude(prompt);
+    document.getElementById('fiyat-text').innerText = result;
+    document.getElementById('fiyat-result').classList.add('show');
+    saveToHistory('💰 Fiyat', tedavi, result);
+  } catch(e) { alert('Hata: ' + e.message); }
+
+  document.getElementById('fiyat-loading').classList.remove('show');
+}
+
+// ===== İÇERİK =====
+async function icerikUret() {
+  const konu = document.getElementById('ic-konu').value;
+  if (!konu) { alert('Konu seç!'); return; }
+
+  const tonMap = {merak:'merak uyandıran', guven:'güven inşa eden', sonuc:'sonuç odaklı', duygusal:'duygusal/ilham verici', cta:'harekete geçirici (CTA)'};
+  const fmtMap = {reel:'Instagram Reels caption', story:'Instagram Story kısa metin (max 3 cümle)', carousel:'Instagram Carousel (başlık + 5 slayt metni)'};
+  const dilMap = {tr:'Türkçe', de:'Almanca', both:'hem Türkçe hem Almanca (ikisi ayrı ayrı)'};
+
+  document.getElementById('icerik-loading').classList.add('show');
+  document.getElementById('icerik-result').classList.remove('show');
+
+  const prompt = `Pem Beauty Lab Instagram içeriği yaz.
+
+Marka: Pem Beauty Lab — Antalya/Almanya, referansla çalışan estetik uzman
+Konu: ${konu}
+Ton: ${tonMap[state.ton]}
+Format: ${fmtMap[state.format]}
+Dil: ${dilMap[state.icdil]}
+
+Marka sesi: özgüvenli, sıcak, uzman, samimi. Emoji kullan. İngilizce hashtag ekle. Çok uzun olmasın.`;
+
+  try {
+    const result = await callClaude(prompt);
+    document.getElementById('icerik-text').innerText = result;
+    document.getElementById('icerik-result').classList.add('show');
+    saveToHistory('📱 İçerik', `${konu} - ${state.format}`, result);
+  } catch(e) { alert('Hata: ' + e.message); }
+
+  document.getElementById('icerik-loading').classList.remove('show');
+}
+</script>
+</body>
+</html>
